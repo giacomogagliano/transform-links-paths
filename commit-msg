@@ -1,0 +1,3 @@
+#!/bin/sh
+# Aggiunge --local al messaggio di commit
+echo "--local $(cat "$1")" > "$1"

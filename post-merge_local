@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Ottieni l'ultimo messaggio di commit
+last_commit_message=$(git log -1 --pretty=%B)
+
+# Controlla se ci troviamo sul branch 'main'
+if [ $(git rev-parse --abbrev-ref HEAD) = "main" ]; then
+  # Controlla se il merge proviene da un fetch dal repository remoto
+  if [[ $last_commit_message == *"--local"* ]]; then
+    # Log per indicare che è stato effettuato il merge di un branch remoto
+    echo "Merge effettuato da un fetch dal repository locale"
+  else
+    # Merge dovuto a modifiche remote
+    bun mergeScript.ts
+  fi
+fi
