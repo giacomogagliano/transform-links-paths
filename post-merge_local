@@ -23,6 +23,6 @@ if [ $(git rev-parse --abbrev-ref HEAD) = "main" ]; then
     echo "Merge effettuato da un fetch dal repository locale"
   else
     # Merge dovuto a modifiche remote
-    bun mergeScript.ts
+    bun $TRANSFORM_LINKS_PATHS_DIR
   fi
 fi
