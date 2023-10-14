@@ -1,5 +1,31 @@
 #!/bin/sh
 
+# Ottieni il path degli script da fare andare dopo un merge
+# TODO mettere questa parte che è uguale al file post-merge_local in un file a parte.
+
+RED='\033[0;31m'
+NC='\033[0m'
+FILE=.env
+KEY="TRANSFORM_LINKS_PATHS_DIR"
+if [ -f "$FILE" ]; then
+  source $FILE
+  echo $TRANSFORM_LINKS_PATHS_DIR
+else
+  echo "${RED}>>>>___ATTENZIONE___<<<<${NC} Arianna!!!!\nIl file $FILE non esiste. Copia il path della cartella contenente gli script post-merge in un file .env nella cartella $PWD"
+  exit 1
+fi
+
+# controlla che la chiave TRANSFORM_LINKS_PATHS_DIR sia presente nel file `.env`
+
+if grep -q "^$KEY=" "$FILE"; then
+  echo "La chiave $KEY esiste nel file $FILE."
+else
+  echo "${RED}>>>>___ATTENZIONE___<<<<${NC} Arianna!!!!\nLa chiave $KEY non esiste nel file .env. Devi mettere 'TRANSFORM_LINKS_PATHS_DIR=path/alla/cartella/con/gli/scripts' e poi puoi effettuare un altro merge.
+  Per farlo basta che vai nella cartella da questa cartella passi il comando \n
+  "
+  exit 1
+fi
+
 # Ottieni l'ultimo messaggio di commit
 last_commit_message=$(git log -1 --pretty=%B)
 
@@ -8,7 +34,7 @@ if [ $(git rev-parse --abbrev-ref HEAD) = "main" ]; then
   # Controlla se il merge proviene da un fetch dal repository remoto
   if [[ $last_commit_message == *"--local"* ]]; then
     # Log per indicare che è stato effettuato il merge di un branch remoto
-    bun mergeScript.ts
+    bun $TRANSFORM_LINKS_PATHS_DIR
   else
     # Merge dovuto a modifiche remote
     echo "Merge effettuato da un fetch dal repository locale"

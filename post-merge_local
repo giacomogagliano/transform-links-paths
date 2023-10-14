@@ -1,5 +1,17 @@
 #!/bin/sh
 
+# Ottieni il path degli script da fare andare dopo un merge
+RED='\033[0;31m'
+NC='\033[0m'
+FILE=.env
+if [ -f "$FILE" ]; then
+  source $FILE
+  echo $TRANSFORM_LINKS_PATHS_DIR
+else
+  echo "${RED}>>>>___ATTENZIONE___<<<<${NC} Arianna!!!!\nIl file $FILE non esiste. Copia il path della cartella contenente gli script post-merge in un file .env nella cartella $PWD"
+  exit 1
+fi
+
 # Ottieni l'ultimo messaggio di commit
 last_commit_message=$(git log -1 --pretty=%B)
 
