@@ -58,8 +58,8 @@ export function transformLinkPaths(
   files.forEach((file) => {
     const filePath = path.join(dir, file);
     if (fs.lstatSync(filePath).isDirectory()) {
-      // Recurse into subdirectories
-      transformLinkPaths(filePath, transform);
+      // Recurse into subdirectories–
+      transformLinkPaths(filePath, transform, handleWiki);
     } else if (path.extname(file) === ".md") {
       // Parse and transform markdown files
       const md = fs.readFileSync(filePath, "utf-8");
@@ -67,7 +67,9 @@ export function transformLinkPaths(
       visit(ast, ["link", "wikiLink", "linkReference"], (node: any) => {
         if (node.type === "wikiLink") {
           handleWiki(node);
-        } else node.url = transform(node.url);
+        } else {
+          node.url = transform(node.url);
+        }
       });
       const newMd = processor.stringify(ast);
       fs.writeFileSync(filePath, newMd);

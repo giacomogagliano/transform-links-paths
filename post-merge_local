@@ -14,15 +14,32 @@ fi
 
 # Ottieni l'ultimo messaggio di commit
 last_commit_message=$(git log -1 --pretty=%B)
-
+# recupera il nome del branch che si sta mergiando
+branch=$(echo $GIT_REFLOG_ACTION | awk '{print $2}')
+activebranch=$(git rev-parse --abbrev-ref HEAD)
+if [ -z "$branch" ]; then
+  # Se è vuota, assegna il valore "default"
+  branch="remoto"
+fi
+activebranch=$(git rev-parse --abbrev-ref HEAD)
 # Controlla se ci troviamo sul branch 'main'
-if [ $(git rev-parse --abbrev-ref HEAD) = "main" ]; then
-  # Controlla se il merge proviene da un fetch dal repository remoto
-  if [[ $last_commit_message == *"--local"* ]]; then
-    # Log per indicare che è stato effettuato il merge di un branch remoto
-    echo "Merge effettuato da un fetch dal repository locale"
-  else
-    # Merge dovuto a modifiche remote
-    bun $TRANSFORM_LINKS_PATHS_DIR
+echo "si sta mergiando il branch $branch su $activebranch"
+if [[ $branch = "remoto" ]]; then
+  echo non faremo nulla
+  exit 1
+fi
+if [[ $activebranch = "main" ]]; then
+  echo faremo andare lo script che cambia da git/\<dominio\>/\*\*/\* a assets/\*\*/\*
+  bun $TRANSFORM_LINKS_PATHS_DIR $branch $activebranch
+  echo i path sono stati cambiati con successo
+  git add .
+  git commit -m "post-merge: cambiati i path dei link"
+else
+  if [[ $branch = "main" ]]; then
+    echo faremo andare lo script che cambia da assets/\*\*/\* a git/\<dominio\>/\*\*/\*
+    bun $TRANSFORM_LINKS_PATHS_DIR $branch $activebranch
+    echo i path sono stati cambiati con successo
+    git add .
+    git commit -m "post-merge: cambiati i path dei link"
   fi
 fi
